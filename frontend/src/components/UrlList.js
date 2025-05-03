@@ -14,10 +14,15 @@ import {
     Button,
     Typography,
     IconButton,
+    Tooltip,
+    Grid,
+    Card,
+    CardContent,
+    CardActions,
 } from '@mui/material';
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { useTheme, useMediaQuery } from '@mui/material';
 import { fetchUrls, updateUrl, deleteUrl } from '../redux/urlSlice';
 import { BACKEND_API } from '../apiConfig';
 
@@ -27,16 +32,14 @@ const UrlList = () => {
     const [nameFilter, setNameFilter] = useState('');
     const [dateFilter, setDateFilter] = useState('');
 
+    // use theme and media query for responsive design
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
     //useEffect to fetch URLs when the component mounts or filters change
     useEffect(() => {
         dispatch(fetchUrls({ name: nameFilter, date: dateFilter }));
     }, [nameFilter, dateFilter, dispatch]);
-
-    // Function to handle copying the short URL to clipboard
-    const handleCopy = (shortUrl) => {
-        navigator.clipboard.writeText(shortUrl);
-        alert('Copied to clipboard!');
-    };
 
     // Function to handle updating a URL
     const handleUpdate = (id) => {
@@ -62,7 +65,8 @@ const UrlList = () => {
     //handle url click
     const handleUrlClick = (shortUrl) => {
         window.open(`${BACKEND_API}/urls/${shortUrl}`, '_blank');
-        
+        //refresh the list after clicking the URL
+        dispatch(fetchUrls({ name: nameFilter, date: dateFilter }));
     }
 
     const totalResults = urls.length;
@@ -94,47 +98,110 @@ const UrlList = () => {
                 <Box sx={{ textAlign: 'center' }}>Loading...</Box>
             ) : (
                 <>
-                    <TableContainer component={Paper} sx={{ mb: 2 }}>
-                        <Table>
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell>Short URL</TableCell>
-                                    <TableCell>Original URL</TableCell>
-                                    <TableCell>Clicks</TableCell>
-                                    <TableCell>Created Date</TableCell>
-                                    <TableCell>Expiration</TableCell>
-                                    <TableCell>Actions</TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {urls.map((url) => (
-                                    <TableRow key={url.id}>
-                                        <TableCell>
-                                            <Button
-                                                variant="text"
-                                                color="primary"
-                                                onClick={() => handleUrlClick(url.shortUrl)}
-                                            >
-                                                {url.shortUrl}
-                                            </Button>
-                                        </TableCell>
-                                        <TableCell>{url.originalUrl}</TableCell>
-                                        <TableCell>{url.analytics?.clickCount || 0}</TableCell>
-                                        <TableCell>{new Date(url.createdAt).toLocaleDateString()}</TableCell>
-                                        <TableCell>{new Date(url.expiresAt).toLocaleDateString()}</TableCell>
-                                        <TableCell>
+                    {isMobile ? (
+                        <Grid container spacing={2}>
+                            {urls.map((url) => (
+                                <Grid item xs={12} sm={6} md={4} key={url.id}>
+                                    <Card variant="outlined">
+                                        <CardContent>
+                                            {url.isActive ? (
+                                                <Button
+                                                    variant="text"
+                                                    color="primary"
+                                                    onClick={() => handleUrlClick(url.shortUrl)}
+                                                >
+                                                    {url.shortUrl}
+                                                </Button>
+                                            ) : (
+                                                <Tooltip title="This URL is disabled" arrow>
+                                                    <span>
+                                                        <Button
+                                                            variant="text"
+                                                            color="primary"
+                                                            disabled
+                                                            sx={{ cursor: 'not-allowed' }}
+                                                        >
+                                                            {url.shortUrl}
+                                                        </Button>
+                                                    </span>
+                                                </Tooltip>
+                                            )}
+                                            <Typography variant="h6">{url.shortUrl}</Typography>
+                                            <Typography variant="body2">{url.originalUrl}</Typography>
+                                            <Typography variant="body2">Clicks: {url.analytics?.clickCount || 0}</Typography>
+                                            <Typography variant="body2">Created: {new Date(url.createdAt).toLocaleDateString()}</Typography>
+                                            <Typography variant="body2">Expires: {new Date(url.expiresAt).toLocaleDateString()}</Typography>
+                                        </CardContent>
+                                        <CardActions sx={{ justifyContent: 'space-between' }}>
                                             <IconButton onClick={() => handleUpdate(url.id)} color="primary">
                                                 <EditIcon />
                                             </IconButton>
                                             <IconButton onClick={() => handleDelete(url.id)} color="secondary">
                                                 <DeleteIcon />
                                             </IconButton>
-                                        </TableCell>
+                                        </CardActions>
+                                    </Card>
+                                </Grid>
+                            ))}
+                        </Grid>
+                    ) : (
+                        <TableContainer component={Paper} sx={{ mb: 2 }}>
+                            <Table>
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell>Short URL</TableCell>
+                                        <TableCell>Original URL</TableCell>
+                                        <TableCell>Clicks</TableCell>
+                                        <TableCell>Created Date</TableCell>
+                                        <TableCell>Expiration</TableCell>
+                                        <TableCell>Actions</TableCell>
                                     </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
+                                </TableHead>
+                                <TableBody>
+                                    {urls.map((url) => (
+                                        <TableRow key={url.id}>
+                                            <TableCell>
+                                                {url.isActive ? (
+                                                    <Button
+                                                        variant="text"
+                                                        color="primary"
+                                                        onClick={() => handleUrlClick(url.shortUrl)}
+                                                    >
+                                                        {url.shortUrl}
+                                                    </Button>
+                                                ) : (
+                                                    <Tooltip title="This URL is disabled" arrow>
+                                                        <span>
+                                                            <Button
+                                                                variant="text"
+                                                                color="primary"
+                                                                disabled
+                                                                sx={{ cursor: 'not-allowed' }}
+                                                            >
+                                                                {url.shortUrl}
+                                                            </Button>
+                                                        </span>
+                                                    </Tooltip>
+                                                )}
+                                            </TableCell>
+                                            <TableCell>{url.originalUrl}</TableCell>
+                                            <TableCell>{url.analytics?.clickCount || 0}</TableCell>
+                                            <TableCell>{new Date(url.createdAt).toLocaleDateString()}</TableCell>
+                                            <TableCell>{new Date(url.expiresAt).toLocaleDateString()}</TableCell>
+                                            <TableCell>
+                                                <IconButton onClick={() => handleUpdate(url.id)} color="primary">
+                                                    <EditIcon />
+                                                </IconButton>
+                                                <IconButton onClick={() => handleDelete(url.id)} color="secondary">
+                                                    <DeleteIcon />
+                                                </IconButton>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+                    )}
                     <Box sx={{ textAlign: 'center', mb: 2 }}>
                         <Typography variant="body2">
                             Showing {startResult} to {endResult} of {totalResults} results

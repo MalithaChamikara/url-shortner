@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TextField, Button, Box, MenuItem, Select, InputLabel, FormControl } from '@mui/material';
+import { TextField, Button, Box, MenuItem, Select, FormControl } from '@mui/material';
 import axios from 'axios';
 import { BACKEND_API } from '../apiConfig';
 
@@ -8,7 +8,7 @@ const UrlForm = ({ onUrlCreated, onCancel }) => {
 
     const [originalUrl, setOriginalUrl] = useState('');
     const [alias, setAlias] = useState('');
-    const [expiryDays, setExpiryDays] = useState(7);
+    const [expiryDays, setExpiryDays] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
@@ -49,8 +49,8 @@ const UrlForm = ({ onUrlCreated, onCancel }) => {
                 margin="normal"
             />
             <FormControl fullWidth margin="normal">
-                <InputLabel>Expiry Days</InputLabel>
-                <Select value={expiryDays} onChange={(e) => setExpiryDays(e.target.value)}>
+                <Select value={expiryDays} onChange={(e) => setExpiryDays(e.target.value)} displayEmpty>
+                    <MenuItem value="" disabled >Select Expiry Days</MenuItem>
                     <MenuItem value={1}>1 Day</MenuItem>
                     <MenuItem value={7}>7 Days</MenuItem>
                     <MenuItem value={30}>30 Days</MenuItem>
