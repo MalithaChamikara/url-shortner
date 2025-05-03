@@ -55,10 +55,11 @@ const generateShortUrl = async (originalUrl, alias, expiryDays = 7) => {
 // get Url by shortUrl
 const getUrlByShortUrl = async (shortUrl) => {
     try {
-        const url = await Url.findOne({ where: { shortUrl } });
+        const url = await Url.findOne({ where: { shortUrl, isActive: true } });
         if (!url) {
             throw new Error('URL not found');
         }
+
 
         const analytics = await Analytics.findOne({ where: { urlId: url.id } });
         if (analytics) {
@@ -89,7 +90,7 @@ const getAllUrls = async (name, date) => {
         }
         const urls = await Url.findAll({
             where,
-            include: [{ model: Analytics,as:'analytics' }], // Include Analytics model
+            include: [{ model: Analytics, as: 'analytics' }], // Include Analytics model
         });
 
         console.log('Fetched URLs:', urls);

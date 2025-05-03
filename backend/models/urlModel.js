@@ -26,11 +26,16 @@ const Url = sequelize.define('url', {
     type: DataTypes.DATE,
     allowNull: false,
   },
+  isActive: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: true,
+  },
   createdAt: {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW,
   },
 });
+
 
 // Define the association
 Url.hasOne(Analytics, { foreignKey: 'urlId', as: 'analytics' });

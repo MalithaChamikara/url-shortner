@@ -1,6 +1,6 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
-const Url = require('./urlModel'); 
+const Url = require('./urlModel');
 
 const Analytics = sequelize.define('analytics', {
   id: {
@@ -12,7 +12,7 @@ const Analytics = sequelize.define('analytics', {
     type: DataTypes.INTEGER,
     allowNull: false,
     references: {
-      model:'urls',
+      model: 'urls',
       key: 'id',
     },
   },

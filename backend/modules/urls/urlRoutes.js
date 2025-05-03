@@ -1,15 +1,16 @@
 const express = require('express');
 const router = express.Router();
 const urlController = require('./urlController');
-const limiter = require('../../middlewares/rateLimit'); 
+const limiter = require('../../middlewares/rateLimit');
+const checkExpiration = require('../../middlewares/checkUrlExpiration');
 
 //Routes
 
 // POST /api/urls/shortenUrl
-router.post('/shortenUrl',limiter, urlController.handleShortenUrl);
+router.post('/shortenUrl', limiter, urlController.handleShortenUrl);
 
 // GET /api/urls/:shortUrl
-router.get('/:shortUrl', urlController.handleRedirect);
+router.get('/:shortUrl', checkExpiration, urlController.handleRedirect);
 
 // GET /api/urls
 router.get('/', urlController.getAllUrlsHandler);
