@@ -19,6 +19,7 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { fetchUrls, updateUrl, deleteUrl } from '../redux/urlSlice';
+import { BACKEND_API } from '../apiConfig';
 
 const UrlList = () => {
     const { urls, loading, error } = useSelector((state) => state.urls);
@@ -56,6 +57,12 @@ const UrlList = () => {
         if (window.confirm('Are you sure you want to delete this URL?')) {
             dispatch(deleteUrl(id));
         }
+    }
+
+    //handle url click
+    const handleUrlClick = (shortUrl) => {
+        window.open(`${BACKEND_API}/urls/${shortUrl}`, '_blank');
+        
     }
 
     const totalResults = urls.length;
@@ -102,9 +109,17 @@ const UrlList = () => {
                             <TableBody>
                                 {urls.map((url) => (
                                     <TableRow key={url.id}>
-                                        <TableCell>{`${url.shortUrl}`}</TableCell>
+                                        <TableCell>
+                                            <Button
+                                                variant="text"
+                                                color="primary"
+                                                onClick={() => handleUrlClick(url.shortUrl)}
+                                            >
+                                                {url.shortUrl}
+                                            </Button>
+                                        </TableCell>
                                         <TableCell>{url.originalUrl}</TableCell>
-                                        <TableCell>{url.Analytics?.clickCount || 0}</TableCell>
+                                        <TableCell>{url.analytics?.clickCount || 0}</TableCell>
                                         <TableCell>{new Date(url.createdAt).toLocaleDateString()}</TableCell>
                                         <TableCell>{new Date(url.expiresAt).toLocaleDateString()}</TableCell>
                                         <TableCell>

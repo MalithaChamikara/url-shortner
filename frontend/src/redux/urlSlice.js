@@ -1,10 +1,11 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
+import { BACKEND_API } from "../apiConfig";
 
 // Async thunk to fetch URLs from the server
 export const fetchUrls = createAsyncThunk("urls/fetchUrls", async ({ name, date }) => {
     try {
-        const response = await axios.get("http://localhost:5000/api/urls", {
+        const response = await axios.get(`${BACKEND_API}/urls`, {
             params: { name, date },
         });
         return response.data;
@@ -16,17 +17,17 @@ export const fetchUrls = createAsyncThunk("urls/fetchUrls", async ({ name, date 
 
 // Update URL
 export const updateUrl = createAsyncThunk('urls/updateUrl', async ({ id, data }) => {
-    const response = await axios.put(`/api/urls/${id}`, data);
+    const response = await axios.put(`${BACKEND_API}/urls/${id}`, data);
     return response.data;
 });
 
 // Delete URL
 export const deleteUrl = createAsyncThunk('urls/deleteUrl', async (id) => {
-    await axios.delete(`/api/urls/${id}`);
+    await axios.delete(`${BACKEND_API}/urls/${id}`);
     return id; // Return the ID of the deleted URL
 });
 
-// craete slice for url which will contain the state and reducers
+// create slice for url which will contain the state and reducers
 const urlSlice = createSlice({
     name: "urls",
     initialState: {

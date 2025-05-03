@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { TextField, Button, Box, MenuItem, Select, InputLabel, FormControl } from '@mui/material';
 import axios from 'axios';
+import { BACKEND_API } from '../apiConfig';
+
 
 const UrlForm = ({ onUrlCreated, onCancel }) => {
 
@@ -16,7 +18,7 @@ const UrlForm = ({ onUrlCreated, onCancel }) => {
         setLoading(true);
         setError('');
         try {
-            const response = await axios.post('http://localhost:5000/api/urls/shortenUrl', {
+            const response = await axios.post(`${BACKEND_API}/urls/shortenUrl`, {
                 originalUrl,
                 alias,
                 expiryDays,
