@@ -17,7 +17,8 @@ const generateShortUrl = async (originalUrl, alias, expiryDays = 7) => {
         if (!isValidUrl(originalUrl)) {
             throw new Error('Invalid URL format');
         }
-        let shortUrl = crypto.randomBytes(4).toString('hex'); // Generate a random 8-character string
+        // Generate a random 8-character string
+        let shortUrl = crypto.randomBytes(4).toString('hex'); 
         //set expiration time 
         const expiresAt = new Date(Date.now() + expiryDays * 24 * 60 * 60 * 1000);
         // Check if the alias is already in use
@@ -28,8 +29,9 @@ const generateShortUrl = async (originalUrl, alias, expiryDays = 7) => {
             }
             shortUrl = alias; // Use the provided alias
         } else {
+            alias = null
             // Check if the generated short URL already exists
-            const existingUrl = await Url.findOne({ where: { shortUrl } });
+            let existingUrl = await Url.findOne({ where: { shortUrl } });
             while (existingUrl) {
                 shortUrl = crypto.randomBytes(4).toString('hex');// Generate a new random string
                 existingUrl = await Url.findOne({ where: { shortUrl } });
@@ -46,6 +48,7 @@ const generateShortUrl = async (originalUrl, alias, expiryDays = 7) => {
         await Analytics.create({ urlId: newUrl.id, clickCount: 0 });
         return newUrl;
     } catch (error) {
+        console.error(error);
         console.error('Error generating short URL:', error.message);
         throw error
     }
