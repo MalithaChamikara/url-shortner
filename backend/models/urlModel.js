@@ -1,5 +1,6 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
+const Analytics = require('./analytics');
 
 const Url = sequelize.define('url', {
   id: {
@@ -18,6 +19,7 @@ const Url = sequelize.define('url', {
   },
   alias: {
     type: DataTypes.STRING,
+    allowNull: true,
     unique: true,
   },
   expiresAt: {
@@ -29,5 +31,9 @@ const Url = sequelize.define('url', {
     defaultValue: DataTypes.NOW,
   },
 });
+
+// Define the association
+Url.hasOne(Analytics, { foreignKey: 'urlId', as: 'analytics' });
+Analytics.belongsTo(Url, { foreignKey: 'urlId', as: 'url' });
 
 module.exports = Url;

@@ -2,6 +2,7 @@ const crypto = require('crypto');
 const { Op } = require('sequelize');
 const Url = require('../../models/urlModel');
 const Analytics = require('../../models/analytics');
+const axios = require('axios');
 
 //Vlidate URL format
 const isValidUrl = (url) => {
@@ -86,7 +87,14 @@ const getAllUrls = async (name, date) => {
                 [Op.lte]: new Date(new Date(date).setDate(new Date(date).getDate() + 1)),
             };
         }
-        return await Url.findAll({}, { where, include: [{ model: Analytics }] });
+        const urls = await Url.findAll({
+            where,
+            include: [{ model: Analytics,as:'analytics' }], // Include Analytics model
+        });
+
+        console.log('Fetched URLs:', urls);
+        return urls;
+
     } catch (error) {
         console.error('Error fetching URLs:', error.message);
         throw error;
@@ -121,6 +129,8 @@ const deleteUrlById = async (id) => {
         throw error;
     }
 };
+
+
 module.exports = {
     isValidUrl,
     generateShortUrl,

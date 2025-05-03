@@ -1,4 +1,6 @@
 const urlService = require('./urlService');
+const {generateRedirectHtml} = require('../../utils/redirect');
+require('dotenv').config();
 
 // Handle URL shortening
 const handleShortenUrl = async (req, res) => {
@@ -21,9 +23,10 @@ const handleRedirect = async (req, res) => {
         if (!url) {
             return res.status(404).json({ error: 'URL not found' });
         }
-        
-        res.redirect(url.originalUrl);
-    } catch (error) {
+        //generate the html for redirection
+        const html  = generateRedirectHtml(shortUrl, url.originalUrl, process.env.FRONTEND_URL);
+        res.send(html)
+    } catch (error) {   
         console.error('Error redirecting URL:', error.message);
         res.status(500).json({ error: 'Error occurred while redirecting URL' });
     }
@@ -60,7 +63,7 @@ const updateUrlHandler = async (req, res) => {
 const deleteUrlHandler = async (req, res) => {
     const { id } = req.params;
     try {
-        const url = await urlService.deleteUrl(id);
+        const url = await urlService.deleteUrlById(id);
         if (!url) {
             return res.status(404).json({ error: 'URL not found' });
         }
@@ -70,6 +73,7 @@ const deleteUrlHandler = async (req, res) => {
         res.status(500).json({ error: 'Error occurred while deleting URL' });
     }
 }
+
 
 module.exports = {
     handleShortenUrl,

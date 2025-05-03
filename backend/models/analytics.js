@@ -10,8 +10,9 @@ const Analytics = sequelize.define('analytics', {
   },
   urlId: {
     type: DataTypes.INTEGER,
+    allowNull: false,
     references: {
-      model: Url,
+      model:'urls',
       key: 'id',
     },
   },
@@ -21,7 +22,5 @@ const Analytics = sequelize.define('analytics', {
   },
 });
 
-Url.hasOne(Analytics, { foreignKey: 'urlId' });
-Analytics.belongsTo(Url, { foreignKey: 'urlId' });
 
 module.exports = Analytics;
